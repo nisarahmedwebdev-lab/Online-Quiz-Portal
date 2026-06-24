@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-&5mb*6(j-0zxt7pu49d9f@se#uh&3wjm@h-sy=qr+@zb%2*ecq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['online-quiz-portal.onrender.com']
 
 
 # Application definition
