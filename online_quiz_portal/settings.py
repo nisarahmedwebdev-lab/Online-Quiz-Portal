@@ -25,11 +25,7 @@ SECRET_KEY = 'django-insecure-&5mb*6(j-0zxt7pu49d9f@se#uh&3wjm@h-sy=qr+@zb%2*ecq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = [
-    'online-quiz-portal-lsx2.onrender.com',
-    'online-quiz-portal.onrender.com',
-    '.onrender.com'
-]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -46,6 +42,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
