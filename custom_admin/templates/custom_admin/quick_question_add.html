@@ -1,0 +1,122 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Quick Question Add - Admin Panel{% endblock %}
+{% block page_title %}Quick Question Add{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Add Question Quickly</h6>
+                <div>
+                    <a href="{% url 'bulk_quiz_upload' %}" class="btn btn-sm btn-info">Bulk Upload</a>
+                    <a href="{% url 'manage_questions' %}" class="btn btn-sm btn-secondary">All Questions</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post" id="quickQuestionForm">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.quiz.label_tag }}
+                                {{ form.quiz }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form.marks.label_tag }}
+                                {{ form.marks }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.question_text.label_tag }}
+                        {{ form.question_text }}
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6>Options:</h6>
+                            <div class="mb-3">
+                                {{ form.option1.label_tag }}
+                                {{ form.option1 }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.option2.label_tag }}
+                                {{ form.option2 }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.option3.label_tag }}
+                                {{ form.option3 }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.option4.label_tag }}
+                                {{ form.option4 }}
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h6>Correct Answer:</h6>
+                            <div class="border p-3 rounded">
+                                {% for radio in form.correct_option %}
+                                <div class="form-check mb-2">
+                                    {{ radio.tag }}
+                                    <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                        {{ radio.choice_label }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">Add Question</button>
+                        <button type="button" class="btn btn-success" onclick="addAnother()">Add & Add Another</button>
+                        <a href="{% url 'manage_questions' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Bootstrap classes to form fields
+    const quizSelect = document.getElementById('{{ form.quiz.id_for_label }}');
+    const marksInput = document.getElementById('{{ form.marks.id_for_label }}');
+    const questionText = document.getElementById('{{ form.question_text.id_for_label }}');
+    const option1 = document.getElementById('{{ form.option1.id_for_label }}');
+    const option2 = document.getElementById('{{ form.option2.id_for_label }}');
+    const option3 = document.getElementById('{{ form.option3.id_for_label }}');
+    const option4 = document.getElementById('{{ form.option4.id_for_label }}');
+    
+    if (quizSelect) quizSelect.className = 'form-control';
+    if (marksInput) marksInput.className = 'form-control';
+    if (questionText) questionText.className = 'form-control';
+    if (option1) option1.className = 'form-control';
+    if (option2) option2.className = 'form-control';
+    if (option3) option3.className = 'form-control';
+    if (option4) option4.className = 'form-control';
+    
+    // Auto-focus on question text
+    if (questionText) questionText.focus();
+});
+
+function addAnother() {
+    // Set a flag to indicate "add another"
+    const form = document.getElementById('quickQuestionForm');
+    const hiddenInput = document.createElement('input');
+    hiddenInput.type = 'hidden';
+    hiddenInput.name = 'add_another';
+    hiddenInput.value = 'true';
+    form.appendChild(hiddenInput);
+    form.submit();
+}
+</script>
+{% endblock %}

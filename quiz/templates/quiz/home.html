@@ -1,0 +1,95 @@
+{% extends 'quiz/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="hero-panel text-center mx-auto">
+            <h1 class="mb-4">
+                <i class="fas fa-brain text-primary"></i> Welcome to Online Quiz Portal
+            </h1>
+            <p class="lead text-muted mb-5">Test your knowledge with our comprehensive quiz system.</p>
+            {% if not request.session.student_id %}
+            <a href="{% url 'student_login' %}" class="btn btn-primary btn-lg px-5 py-3">
+                <i class="fas fa-sign-in-alt"></i> Student Login
+            </a>
+            {% else %}
+            <a href="{% url 'quiz_list' %}" class="btn btn-primary btn-lg px-5 py-3 me-3">
+                <i class="fas fa-list"></i> View Available Quizzes
+            </a>
+            <a href="{% url 'student_logout' %}" class="btn btn-outline-primary btn-lg px-5 py-3">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="section-panel">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row">
+                <div>
+                    <h2 class="section-title mb-2">Available Subjects</h2>
+                    <p class="text-muted mb-0">Choose a subject and start your learning journey.</p>
+                </div>
+            </div>
+            <div class="row mt-4">
+                {% for subject in subjects %}
+                <div class="col-md-4 mb-4">
+                    <div class="card quiz-card h-100">
+                        <div class="card-body text-center">
+                            <div class="display-6 text-primary mb-3">
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <h5 class="card-title mb-2">{{ subject.name }}</h5>
+                            <p class="card-text text-muted mb-4">{{ subject.description|default:"Test your knowledge in this subject"|truncatewords:18 }}</p>
+                            {% if request.session.student_id %}
+                            <a href="{% url 'subject_quizzes' subject.id %}" class="btn btn-outline-primary btn-sm py-2 px-4">
+                                View Quizzes
+                            </a>
+                            {% else %}
+                            <span class="badge bg-secondary">Login to view quizzes</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p class="text-muted">No subjects available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if request.session.student_id %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="section-panel">
+            <h3 class="section-title mb-4">Quick Actions</h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <a href="{% url 'quiz_list' %}" class="card h-100 text-decoration-none text-dark quiz-card">
+                        <div class="card-body text-center py-5">
+                            <div class="display-6 text-primary mb-3"><i class="fas fa-list"></i></div>
+                            <h5>View All Quizzes</h5>
+                            <p class="text-muted">Continue with the same account and open available quizzes.</p>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-6">
+                    <a href="{% url 'student_logout' %}" class="card h-100 text-decoration-none text-dark quiz-card">
+                        <div class="card-body text-center py-5">
+                            <div class="display-6 text-primary mb-3"><i class="fas fa-sign-out-alt"></i></div>
+                            <h5>New Student</h5>
+                            <p class="text-muted">Let another student login and take a quiz.</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

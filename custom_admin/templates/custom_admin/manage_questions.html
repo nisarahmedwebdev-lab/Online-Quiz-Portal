@@ -1,0 +1,145 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Manage Questions - Admin Panel{% endblock %}
+{% block page_title %}{% if quiz %}Questions for: {{ quiz.title }}{% else %}Question Management{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Add New Question</h6>
+                {% if quiz %}
+                <a href="{% url 'manage_questions' %}" class="btn btn-sm btn-secondary">View All Questions</a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="{{ form.quiz.id_for_label }}" class="form-label">{{ form.quiz.label }}</label>
+                                {{ form.quiz }}
+                                {% if form.quiz.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.quiz.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                <label for="{{ form.marks.id_for_label }}" class="form-label">{{ form.marks.label }}</label>
+                                {{ form.marks }}
+                                {% if form.marks.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.marks.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="{{ form.question_text.id_for_label }}" class="form-label">{{ form.question_text.label }}</label>
+                        {{ form.question_text }}
+                        {% if form.question_text.errors %}
+                        <div class="text-danger">
+                            {% for error in form.question_text.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Question & Add Options</button>
+                    <small class="text-muted d-block mt-2">After adding question, you will be redirected to add options.</small>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    {% if quiz %}Questions for "{{ quiz.title }}" ({{ questions.count }}){% else %}All Questions ({{ questions.count }}){% endif %}
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if questions %}
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Quiz</th>
+                                <th>Subject</th>
+                                <th>Marks</th>
+                                <th>Options</th>
+                                <th>Has Correct</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in questions %}
+                            <tr>
+                                <td>{{ question.question_text|truncatewords:10 }}</td>
+                                <td>{{ question.quiz.title }}</td>
+                                <td>{{ question.quiz.subject.name }}</td>
+                                <td>{{ question.marks }}</td>
+                                <td>
+                                    <span class="badge {% if question.options.count > 0 %}bg-info{% else %}bg-warning{% endif %}">
+                                        {{ question.options.count }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if question.options.filter.is_correct.exists %}
+                                    <span class="badge bg-success">Yes</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">No</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'manage_options' question.id %}" class="btn btn-sm btn-info" title="Manage Options">
+                                        <i class="fas fa-list"></i> Options
+                                    </a>
+                                    <a href="{% url 'edit_question' question.id %}" class="btn btn-sm btn-warning" title="Edit Question">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'delete_question' question.id %}" class="btn btn-sm btn-danger" 
+                                       onclick="return confirm('Are you sure you want to delete this question?')" title="Delete Question">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                    <h5>No Questions Found</h5>
+                    <p class="text-muted">Start by adding your first question using the form above.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Bootstrap classes to form fields
+    const quizSelect = document.getElementById('{{ form.quiz.id_for_label }}');
+    const marksInput = document.getElementById('{{ form.marks.id_for_label }}');
+    const questionText = document.getElementById('{{ form.question_text.id_for_label }}');
+    
+    if (quizSelect) quizSelect.className = 'form-control';
+    if (marksInput) marksInput.className = 'form-control';
+    if (questionText) questionText.className = 'form-control';
+});
+</script>
+{% endblock %}

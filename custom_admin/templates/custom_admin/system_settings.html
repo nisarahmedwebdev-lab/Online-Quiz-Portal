@@ -1,0 +1,63 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}System Settings - Admin Panel{% endblock %}
+{% block page_title %}System Settings{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">System Configuration</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.site_name.label_tag }}
+                                {{ form.site_name }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.max_quiz_time.label_tag }}
+                                {{ form.max_quiz_time }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.site_description.label_tag }}
+                        {{ form.site_description }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check">
+                                {{ form.allow_retakes }}
+                                {{ form.allow_retakes.label_tag }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check">
+                                {{ form.show_results_to_students }}
+                                {{ form.show_results_to_students.label_tag }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3 form-check">
+                                {{ form.maintenance_mode }}
+                                {{ form.maintenance_mode.label_tag }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

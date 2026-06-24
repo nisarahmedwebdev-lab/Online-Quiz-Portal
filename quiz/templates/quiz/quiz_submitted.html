@@ -1,0 +1,57 @@
+{% extends 'quiz/base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="card section-panel border-0">
+            <div class="card-body py-5">
+                <div class="mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
+                        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+                    </svg>
+                </div>
+                <h2 class="card-title text-success mb-3">Quiz Submitted Successfully!</h2>
+                <p class="card-text lead mb-4">
+                    Thank you <strong>{{ student_name }}</strong> for completing the quiz. 
+                    Your answers have been recorded successfully.
+                </p>
+                <p class="text-muted mb-4">
+                    <i class="fas fa-info-circle"></i>
+                    Your results will be available in the admin panel. You can check with your instructor for more details.
+                </p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="card quiz-card h-100">
+                            <div class="card-body">
+                                <h5 class="text-white">Take Another Quiz</h5>
+                                <p class="text-muted">Continue with the same account</p>
+                                <a href="{% url 'quiz_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-list"></i> View Available Quizzes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card quiz-card h-100">
+                            <div class="card-body">
+                                <h5 class="text-white">New Student</h5>
+                                <p class="text-muted">Let another student take a test</p>
+                                <a href="{% url 'student_logout' %}" class="btn btn-outline-primary">
+                                    <i class="fas fa-sign-out-alt"></i> Logout & New Login
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <a href="{% url 'home' %}" class="btn btn-secondary">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

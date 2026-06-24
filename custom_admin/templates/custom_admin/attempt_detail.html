@@ -1,0 +1,90 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Attempt Detail - Admin Panel{% endblock %}
+{% block page_title %}Quiz Attempt Detail{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Attempt Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <p><strong>Student:</strong> {{ attempt.student.name }}</p>
+                        <p><strong>Roll Number:</strong> {{ attempt.student.roll_number }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Quiz:</strong> {{ attempt.quiz.title }}</p>
+                        <p><strong>Subject:</strong> {{ attempt.quiz.subject.name }}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <p><strong>Score:</strong> {{ attempt.score }}/{{ attempt.total_marks }}</p>
+                        <p><strong>Percentage:</strong> 
+                            {% widthratio attempt.score attempt.total_marks 100 as percentage %}
+                            <span class="badge {% if percentage >= 80 %}bg-success{% elif percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}">
+                                {{ percentage }}%
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Started At:</strong> {{ attempt.started_at|date:"M d, Y H:i:s" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Submitted At:</strong> {{ attempt.submitted_at|date:"M d, Y H:i:s" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Student Answers</h6>
+            </div>
+            <div class="card-body">
+                {% for answer in answers %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Question {{ forloop.counter }}</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ answer.question.question_text }}</p>
+                        <p><strong>Marks:</strong> {{ answer.question.marks }}</p>
+                        
+                        <div class="mb-3">
+                            <strong>Options:</strong>
+                            <div class="ms-3">
+                                {% for option in answer.question.options.all %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" disabled 
+                                           {% if option.id == answer.selected_option.id %}checked{% endif %}>
+                                    <label class="form-check-label {% if option.is_correct %}text-success fw-bold{% endif %}">
+                                        {{ option.option_text }}
+                                        {% if option.is_correct %}(Correct){% endif %}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="alert {% if answer.selected_option.is_correct %}alert-success{% else %}alert-danger{% endif %}">
+                            <strong>
+                                {% if answer.selected_option.is_correct %}
+                                ✓ Correct Answer
+                                {% else %}
+                                ✗ Incorrect Answer
+                                {% endif %}
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

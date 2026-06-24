@@ -1,0 +1,41 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Edit Question - Admin Panel{% endblock %}
+{% block page_title %}Edit Question{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Edit Question</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.quiz.label_tag }}
+                                {{ form.quiz }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form.marks.label_tag }}
+                                {{ form.marks }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        {{ form.question_text.label_tag }}
+                        {{ form.question_text }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Question</button>
+                    <a href="{% url 'manage_questions' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

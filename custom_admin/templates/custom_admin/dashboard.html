@@ -1,0 +1,220 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Dashboard - Admin Panel{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Students</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_students }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            Total Quizzes</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_quizzes }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            Quiz Attempts</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_attempts }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stat-card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                            Subjects</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_subjects }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-book fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card shadow border-left-secondary">
+            <div class="card-body d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-3">
+                <div>
+                    <h6 class="m-0 font-weight-bold text-primary">Class name normalization</h6>
+                    <p class="mb-0 text-muted">Run this once to normalize student and quiz class names like <code>BSNG 2k26</code> to <code>BSNG_2k26</code>.</p>
+                </div>
+                <a href="{% url 'normalize_class_names' %}" class="btn btn-primary btn-sm">Run normalization</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Quiz Attempts Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quiz Attempts (Last 7 Days)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="attemptsChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Students -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Top Performing Students</h6>
+            </div>
+            <div class="card-body">
+                {% for student in top_students %}
+                <div class="d-flex align-items-center mb-3">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-user-circle fa-2x text-gray-300"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <div class="small">{{ student.student__name }}</div>
+                        <div class="text-xs text-muted">{{ student.student__roll_number }}</div>
+                        <div class="text-xs">
+                            <span class="text-success">Avg Score: {{ student.avg_score|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted">No quiz attempts yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Attempts -->
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Quiz Attempts</h6>
+                <a href="{% url 'view_results' %}" class="btn btn-sm btn-primary">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Quiz</th>
+                                <th>Started At</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for attempt in recent_attempts %}
+                            <tr>
+                                <td>{{ attempt.student.name }}</td>
+                                <td>{{ attempt.quiz.title }}</td>
+                                <td>{{ attempt.started_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    {% if attempt.submitted_at %}
+                                    <span class="badge bg-success">{{ attempt.score }}/{{ attempt.total_marks }}</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">In Progress</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if attempt.submitted_at %}
+                                    <span class="badge bg-success">Completed</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">In Progress</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No quiz attempts yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Attempts Chart
+    const attemptsCtx = document.getElementById('attemptsChart').getContext('2d');
+    const attemptsData = {{ attempts_data|safe }};
+    
+    const attemptsChart = new Chart(attemptsCtx, {
+        type: 'bar',
+        data: {
+            labels: attemptsData.map(item => item.date),
+            datasets: [{
+                label: 'Quiz Attempts',
+                data: attemptsData.map(item => item.count),
+                backgroundColor: 'rgba(78, 115, 223, 0.5)',
+                borderColor: 'rgba(78, 115, 223, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

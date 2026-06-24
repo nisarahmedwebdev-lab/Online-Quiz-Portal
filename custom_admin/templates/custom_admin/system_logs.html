@@ -1,0 +1,52 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}System Logs - Admin Panel{% endblock %}
+{% block page_title %}System Logs{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">System Activity Logs</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>Type</th>
+                                <th>Message</th>
+                                <th>User</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.timestamp|date:"M d, Y H:i:s" }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if log.log_type == 'SUCCESS' %}bg-success
+                                        {% elif log.log_type == 'ERROR' %}bg-danger
+                                        {% elif log.log_type == 'WARNING' %}bg-warning
+                                        {% else %}bg-info{% endif %}">
+                                        {{ log.log_type }}
+                                    </span>
+                                </td>
+                                <td>{{ log.message }}</td>
+                                <td>{{ log.user.username|default:"System" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No logs found.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

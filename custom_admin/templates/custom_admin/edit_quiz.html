@@ -1,0 +1,63 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Edit Quiz - Admin Panel{% endblock %}
+{% block page_title %}Edit Quiz: {{ quiz.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Edit Quiz</h6>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.title.label_tag }}
+                                {{ form.title }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form.subject.label_tag }}
+                                {{ form.subject }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form.student_class.label_tag }}
+                                {{ form.student_class }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3">
+                                {{ form.time_limit.label_tag }}
+                                {{ form.time_limit }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="mb-3">
+                                {{ form.description.label_tag }}
+                                {{ form.description }}
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-3 form-check">
+                                {{ form.is_active }}
+                                {{ form.is_active.label_tag }}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Quiz</button>
+                    <a href="{% url 'manage_quizzes' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

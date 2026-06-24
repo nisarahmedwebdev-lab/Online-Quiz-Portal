@@ -1,0 +1,140 @@
+{% extends 'custom_admin/base.html' %}
+
+{% block title %}Bulk Quiz Upload - Admin Panel{% endblock %}
+{% block page_title %}Bulk Quiz Upload{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Bulk Upload Questions</h6>
+                <div>
+                    <a href="{% url 'download_quiz_template' 'json' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-download"></i> JSON Template
+                    </a>
+                    <a href="{% url 'download_quiz_template' 'csv' %}" class="btn btn-sm btn-info">
+                        <i class="fas fa-download"></i> CSV Template
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.subject.label_tag }}
+                                {{ form.subject }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form.time_limit.label_tag }}
+                                {{ form.time_limit }}
+                                <div class="form-text">{{ form.time_limit.help_text }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label">Upload Format</label>
+                        <div class="d-flex gap-4">
+                            {% for radio in form.upload_format %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">
+                                    {{ radio.choice_label }}
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.quiz_data.label_tag }}
+                        {{ form.quiz_data }}
+                        <div class="form-text">{{ form.quiz_data.help_text }}</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Upload Questions</button>
+                    <a href="{% url 'manage_questions' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+
+        <!-- Format Examples -->
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">JSON Format Examples</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Single Quiz Format (Recommended):</h6>
+                        <pre class="bg-light p-3 rounded small"><code>{
+  "quiz_title": "Technical and Business Writing",
+  "quiz_description": "30 important multiple-choice questions",
+  "questions": [
+    {
+      "question_text": "What is the main goal of technical writing?",
+      "marks": 1,
+      "options": ["To entertain", "To inform clearly", "Express opinions", "Tell stories"],
+      "correct_option": 2
+    }
+  ]
+}</code></pre>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Multiple Quizzes Format:</h6>
+                        <pre class="bg-light p-3 rounded small"><code>[
+  {
+    "quiz_title": "Quiz 1",
+    "questions": [
+      {
+        "question_text": "Question 1?",
+        "options": ["A", "B", "C", "D"],
+        "correct_option": 1
+      }
+    ]
+  },
+  {
+    "quiz_title": "Quiz 2",
+    "questions": [
+      {
+        "question_text": "Question 2?",
+        "options": ["A", "B", "C", "D"],
+        "correct_option": 2
+      }
+    ]
+  }
+]</code></pre>
+                    </div>
+                </div>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle"></i> 
+                    <strong>Note:</strong> Your JSON data should follow one of these formats. 
+                    The system now supports both single quiz objects and arrays of multiple quizzes.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add Bootstrap classes to form fields
+    const subjectSelect = document.getElementById('{{ form.subject.id_for_label }}');
+    const timeLimitInput = document.getElementById('{{ form.time_limit.id_for_label }}');
+    const quizDataTextarea = document.getElementById('{{ form.quiz_data.id_for_label }}');
+    
+    if (subjectSelect) subjectSelect.className = 'form-control';
+    if (timeLimitInput) timeLimitInput.className = 'form-control';
+    if (quizDataTextarea) quizDataTextarea.className = 'form-control';
+    
+    // Auto-focus on textarea
+    if (quizDataTextarea) quizDataTextarea.focus();
+});
+</script>
+{% endblock %}

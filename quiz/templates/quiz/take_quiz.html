@@ -1,0 +1,258 @@
+﻿{% extends 'quiz/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
+            <div>
+                <h2>{{ quiz.title }}</h2>
+                <p class="text-muted mb-0">Subject: <strong>{{ quiz.subject.name }}</strong></p>
+            </div>
+            <div class="badge bg-secondary py-2 px-3 text-white">
+                <i class="fas fa-stopwatch me-2"></i>
+                {{ quiz.time_limit }} min • {{ quiz.questions.count }} questions
+            </div>
+        </div>
+
+        <div class="section-panel mb-4">
+            <p class="card-text mb-3">{{ quiz.description }}</p>
+            <div class="d-flex flex-column flex-md-row gap-3 text-muted">
+                <div class="badge bg-secondary bg-opacity-30 text-white py-2 px-3">
+                    <i class="fas fa-stopwatch me-2"></i> {{ quiz.time_limit }} minutes
+                </div>
+                <div class="badge bg-secondary bg-opacity-30 text-white py-2 px-3">
+                    <i class="fas fa-list-ul me-2"></i> {{ quiz.questions.count }} questions
+                </div>
+            </div>
+        </div>
+
+        <form id="quizForm" method="post" novalidate>
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="card question-card mb-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center flex-column flex-md-row gap-2">
+                        <h5 class="mb-0">Question {{ forloop.counter }}</h5>
+                        <span class="badge bg-primary bg-opacity-90 text-white">Choose one answer</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text fw-semibold text-dark mb-4">{{ field.label }}</p>
+                    <div class="row g-3">
+                        {% for option in field.field.queryset %}
+                        <div class="col-12">
+                            <label class="form-check option-card mb-0" for="{{ field.name }}_{{ forloop.counter }}">
+                                <input class="form-check-input" type="radio"
+                                       name="{{ field.name }}"
+                                       id="{{ field.name }}_{{ forloop.counter }}"
+                                       value="{{ option.id }}"
+                                       autocomplete="off"
+                                       {% if field.value|stringformat:"s" == option.id|stringformat:"s" %}checked{% endif %}>
+                                <span class="form-check-label">{{ option.option_text }}</span>
+                                <span class="option-badge" data-num="{{ forloop.counter }}">{{ forloop.counter }}</span>
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% if field.errors %}
+                    <div class="text-danger mt-3">
+                        {% for error in field.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-success btn-lg" id="submitQuizBtn">
+                    <i class="fas fa-paper-plane"></i> Submit Quiz
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="sticky-sidebar">
+            <div class="card timer-panel mb-4">
+                <div class="card-body">
+                    <h6 class="text-uppercase text-muted mb-3">Quiz Progress</h6>
+                    <div class="display-6 fw-bold mb-2" id="stickyTimer">00:00</div>
+                    <p class="text-muted mb-3">Time remaining</p>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span>Quiz time</span>
+                        <strong id="timerDetails">{{ quiz.time_limit }} min</strong>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span>Questions left</span>
+                        <strong id="questionsRemaining">{{ quiz.questions.count }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function() {
+    const quizForm = document.getElementById('quizForm');
+    const submitBtn = document.getElementById('submitQuizBtn');
+    const stickyTimer = document.getElementById('stickyTimer');
+    const timerDetails = document.getElementById('timerDetails');
+    const questionsRemainingEl = document.getElementById('questionsRemaining');
+    let timeLeft = {{ time_limit }};
+    let timerInterval;
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function getQuestionCards() {
+        return Array.from(document.querySelectorAll('.question-card'));
+    }
+
+    function isQuestionAnswered(card) {
+        return card.querySelector('input[type="radio"]:checked') !== null;
+    }
+
+    function updateQuestionStates() {
+        getQuestionCards().forEach(card => {
+            const answered = isQuestionAnswered(card);
+            card.classList.toggle('answered', answered);
+            if (!answered) {
+                card.classList.remove('unanswered');
+            }
+            card.querySelectorAll('.option-card').forEach(option => {
+                const input = option.querySelector('input[type="radio"]');
+                const badge = option.querySelector('.option-badge');
+                if (input && badge) {
+                    const selected = input.checked;
+                    option.classList.toggle('active', selected);
+                    badge.classList.toggle('selected', selected);
+                    badge.textContent = selected ? '✓' : badge.dataset.num || badge.textContent;
+                }
+            });
+        });
+    }
+
+    function updateQuestionsRemaining() {
+        const total = getQuestionCards().length;
+        const answered = getQuestionCards().filter(isQuestionAnswered).length;
+        questionsRemainingEl.textContent = Math.max(total - answered, 0);
+    }
+
+    function showValidationError() {
+        if (typeof hideLoading === 'function') {
+            hideLoading();
+        }
+        if (submitBtn) {
+            submitBtn.classList.remove('btn-loading');
+            submitBtn.disabled = false;
+            if (submitBtn.dataset.originalHtml) {
+                submitBtn.innerHTML = submitBtn.dataset.originalHtml;
+            } else {
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Quiz';
+            }
+        }
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Incomplete quiz',
+                text: 'Please attempt all quiz questions before submitting.',
+                confirmButtonText: 'OK'
+            });
+        } else {
+            alert('Please attempt all quiz questions before submitting.');
+        }
+    }
+
+    function highlightUnansweredQuestions() {
+        getQuestionCards().forEach(card => {
+            card.classList.toggle('unanswered', !isQuestionAnswered(card));
+        });
+        const firstUnanswered = getQuestionCards().find(card => !isQuestionAnswered(card));
+        if (firstUnanswered) {
+            firstUnanswered.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function setSubmitLoading() {
+        if (!submitBtn) return;
+        submitBtn.dataset.originalHtml = submitBtn.dataset.originalHtml || submitBtn.innerHTML;
+        submitBtn.classList.add('btn-loading');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+    }
+
+    function updateTimerDisplay() {
+        if (stickyTimer) stickyTimer.textContent = formatTime(timeLeft);
+        if (timerDetails) timerDetails.textContent = `${formatTime(timeLeft)} remaining`;
+    }
+
+    function validateAnswers() {
+        updateQuestionStates();
+        updateQuestionsRemaining();
+        const unanswered = getQuestionCards().filter(card => !isQuestionAnswered(card));
+        if (unanswered.length > 0) {
+            highlightUnansweredQuestions();
+            showValidationError();
+            return false;
+        }
+        return true;
+    }
+
+    function handleSubmit(event) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        event.stopPropagation();
+        if (!validateAnswers()) {
+            return;
+        }
+        setSubmitLoading();
+        if (typeof showLoading === 'function') {
+            showLoading('Submitting Quiz...', 'Please wait while we save your answers');
+        }
+        quizForm.removeEventListener('submit', handleSubmit);
+        quizForm.submit();
+    }
+
+    function startTimer() {
+        updateTimerDisplay();
+        timerInterval = setInterval(() => {
+            timeLeft -= 1;
+            updateTimerDisplay();
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                if (validateAnswers()) {
+                    setSubmitLoading();
+                    if (typeof showLoading === 'function') {
+                        showLoading('Submitting Quiz...', 'Time is up — submitting your answers');
+                    }
+                    quizForm.removeEventListener('submit', handleSubmit);
+                    quizForm.submit();
+                }
+            }
+        }, 1000);
+    }
+
+    if (quizForm) {
+        quizForm.addEventListener('change', () => {
+            updateQuestionStates();
+            updateQuestionsRemaining();
+        });
+        quizForm.addEventListener('submit', handleSubmit);
+    }
+
+    updateQuestionStates();
+    updateQuestionsRemaining();
+    updateTimerDisplay();
+    startTimer();
+})();
+</script>
+{% endblock %}
