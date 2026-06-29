@@ -15,6 +15,8 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'online-quiz-portal-lsx2.onrender.com',
     '.onrender.com',
+    '192.168.100.142',
+    'online-quiz-portal-eight.vercel.app',
     'localhost',
     '127.0.0.1'
 ]
