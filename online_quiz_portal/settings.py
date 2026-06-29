@@ -13,14 +13,10 @@ SECRET_KEY = 'django-insecure-&5mb*6(j-0zxt7pu49d9f@se#uh&3wjm@h-sy=qr+@zb%2*ecq
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    'online-quiz-portal-lsx2.onrender.com',
-    '.onrender.com',
-    '192.168.100.142',
-    'online-quiz-portal-eight.vercel.app',
-    'online-quiz-portal-dwzcivq9k-nisarahmedwebdev-labs-projects.vercel.app',
-    'vercel.com',
-    'localhost',
-    '127.0.0.1',
+    "localhost",
+    "127.0.0.1",
+    ".vercel.app",
+    ".onrender.com",
 ]
 
 # APPLICATIONS
@@ -103,7 +99,8 @@ LOGIN_URL = '/custom-admin/login/'
 
 # CSRF FIX (IMPORTANT FOR RENDER)
 CSRF_TRUSTED_ORIGINS = [
-    'https://online-quiz-portal-lsx2.onrender.com'
+    'https://online-quiz-portal-lsx2.onrender.com',
+    "https://*.vercel.app",
 ]
 
 # DEFAULT PRIMARY KEY
