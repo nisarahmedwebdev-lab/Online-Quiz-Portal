@@ -17,7 +17,7 @@ ALLOWED_HOSTS = [
     '.onrender.com',
     '192.168.100.142',
     'online-quiz-portal-eight.vercel.app',
-    'online-quiz-portal-eight.vercel.app/custom-admin/login/',
+    'online-quiz-portal-dwzcivq9k-nisarahmedwebdev-labs-projects.vercel.app',
     'vercel.com',
     'localhost',
     '127.0.0.1',
